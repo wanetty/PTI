@@ -47,12 +47,24 @@ elif des == -1:
 elif des < 0:
 	print "El descuento tiene que ser un numero igual o mayor que 0"
 else:
+	if submodel == "Diesel":
+		aumento = 1.4
+	else:
+		aumento = 1
 	c = csv.writer(open("BBDD.csv", "a"))
 	c.writerow([model,submodel,dieslloguer,numvehi,des])
 	print "<h2>Su peticion de alquiler ha sido aceptada</h2><br><hr><br>"
-	print "<h3>Factura:</h3>"
-	print "Precio del modelo= "+model
-"""Falta hacer factura"""
+	print "<h3>Factura simplificada:</h3>"
+	print "Precio del modelo= "+model+"<br>"
+	print "Suplemento por submodelo= "+str(aumento)+"<br>"
+	print "Dias de alquiler= "+ str(dieslloguer) +"<br>"
+	print "Numero de vehiculos= "+ str(numvehi)+"<br>"
+	print "Descuento= "+str(des)+"<br>"
+	print "<hr>"
+	total = (num(model)*flot(aumento)*num(dieslloguer)*num(numvehi))*((100-des)/100)
+	print "<b>Total :</b>"+str(total)+"<br><br>"
+print "<a href='http://localhost/p1/carrental_form_new.html' > Volver </a>"	
+	
 
 
 
