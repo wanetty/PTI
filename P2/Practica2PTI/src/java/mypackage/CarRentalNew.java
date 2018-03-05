@@ -48,9 +48,8 @@ public class CarRentalNew extends HttpServlet {
               if (submodel.equals("Diesel")) aumento = 1.4;
               break;
       }
-      
-        String aux = "";
-        String cadena;
+      //Esto sirve para leer el JSON/////////////////////
+        String aux;
         BufferedReader b;
       try (FileReader f = new FileReader("C:\\WORKSPACE\\Universidad\\PTI\\P2\\Practica2PTI\\BBDD.json")) {
           b = new BufferedReader(f);
@@ -60,11 +59,15 @@ public class CarRentalNew extends HttpServlet {
         JSONParser parser = new JSONParser(); 
         JSONObject arch;
         try {
-         arch = (JSONObject) parser.parse(aux);
+         if(aux != null) arch = (JSONObject) parser.parse(aux);
+         else{
+            arch = new JSONObject(); 
+         }
       } catch (ParseException ex) {
           arch = new JSONObject();
       }
-        
+        //////////////////////////////////
+        //AQUI AÑADIMOS LOS OBJETOS//////
         JSONObject obj = new JSONObject();
         obj.put("model",model);
         obj.put("submodel",submodel);
@@ -73,20 +76,17 @@ public class CarRentalNew extends HttpServlet {
         obj.put("descompte",des);
         JSONObject objprin = new JSONObject();
         objprin.put("rental",obj);
-        out.println(arch.toJSONString());
         arch.put("listas", objprin);
-        
-        
-       
-     
-        
+        out.println(arch.toJSONString());
+        /////////////////////////
+        /////////////////Escribimos en el documento///////
       try (FileWriter file = new FileWriter("C:\\WORKSPACE\\Universidad\\PTI\\P2\\Practica2PTI\\BBDD.json")) {
           file.write(arch.toJSONString());
           file.flush();
           file.close();
       }
-
-	
+/////////////////////////////////////////////
+//////////////Imprimimos por pantalla////////////	
       
 	
         
