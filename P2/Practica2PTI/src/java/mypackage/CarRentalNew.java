@@ -1,16 +1,13 @@
 package mypackage;
 
 import java.io.*;
-import javax.json.JsonObject;
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import org.json.simple.JSONArray;
 import java.io.FileWriter;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.json.stream.JsonParser;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -48,43 +45,66 @@ public class CarRentalNew extends HttpServlet {
               if (submodel.equals("Diesel")) aumento = 1.4;
               break;
       }
-      //Esto sirve para leer el JSON/////////////////////
+      ///////////////////////////////////
+      //Primero lectura/////
+       BufferedReader b;
         String aux;
-        BufferedReader b;
-      try (FileReader f = new FileReader("C:\\WORKSPACE\\Universidad\\PTI\\P2\\Practica2PTI\\BBDD.json")) {
+       try (FileReader f = new FileReader("C:\\WORKSPACE\\Universidad\\PTI\\P2\\Practica2PTI\\BBDD.json")) {
           b = new BufferedReader(f);
           aux = b.readLine();
       }
-        b.close();
-        JSONParser parser = new JSONParser(); 
-        JSONObject arch;
-        try {
-         if(aux != null) arch = (JSONObject) parser.parse(aux);
-         else{
-            arch = new JSONObject(); 
-         }
-      } catch (ParseException ex) {
-          arch = new JSONObject();
-      }
-        //////////////////////////////////
-        //AQUI AÑADIMOS LOS OBJETOS//////
-        JSONObject obj = new JSONObject();
-        obj.put("model",model);
-        obj.put("submodel",submodel);
-        obj.put("numvehicles",numvh);
-        obj.put("numdies",numd);
-        obj.put("descompte",des);
-        JSONObject objprin = new JSONObject();
-        objprin.put("rental",obj);
-        arch.put("listas", objprin);
-        out.println(arch.toJSONString());
-        /////////////////////////
-        /////////////////Escribimos en el documento///////
-      try (FileWriter file = new FileWriter("C:\\WORKSPACE\\Universidad\\PTI\\P2\\Practica2PTI\\BBDD.json")) {
-          file.write(arch.toJSONString());
-          file.flush();
-          file.close();
-      }
+      
+      
+      JSONParser parser = new JSONParser();
+    
+    try {
+        JSONArray raiz;     
+        if(aux != null) {
+            Object obj = parser.parse(aux.replace("\\",""));
+            JSONObject jsonObject = (JSONObject) obj;
+             raiz = (JSONArray) jsonObject.get("rentals");
+        }
+            else{
+                raiz = new JSONArray(); 
+                 
+            }
+          
+            
+            
+        
+        
+      
+      ////////////////////////
+        JSONObject obj2 = new JSONObject();
+        JSONArray list = new JSONArray();
+        raiz.add(model);
+        raiz.add(submodel);
+        raiz.add(numvh);
+        raiz.add(numd);
+        raiz.add(des);
+        if (aux != null){
+       
+        obj2.put("rentals", raiz);
+        }
+        else {
+            obj2.put("rentals", raiz);
+        
+        }
+        try (FileWriter file = new FileWriter("C:\\WORKSPACE\\Universidad\\PTI\\P2\\Practica2PTI\\BBDD.JSON")) {
+
+            file.write(obj2.toJSONString());
+            file.flush();
+            file.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
+        System.out.print(obj2);
+
+    
+      
 /////////////////////////////////////////////
 //////////////Imprimimos por pantalla////////////	
       
@@ -107,9 +127,11 @@ public class CarRentalNew extends HttpServlet {
     
     
     
-  }
+  }   catch (ParseException ex) {
+          Logger.getLogger(CarRentalNew.class.getName()).log(Level.SEVERE, null, ex);
+      }
 
-  
+  }
   @Override
   public void doPost(HttpServletRequest req, HttpServletResponse res)
                     throws ServletException, IOException {
