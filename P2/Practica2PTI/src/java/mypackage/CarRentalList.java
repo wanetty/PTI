@@ -55,7 +55,23 @@ public class CarRentalList extends HttpServlet {
 	
 	  while (iterator.hasNext()){ 
 		out.println( "<tr>");
-		out.println( "<td>" + iterator.next() + "</td>");
+                String modelo = iterator.next();
+               switch (modelo) {
+                   case "54":
+                       out.println( "<td>Economic</td>");
+                       break;
+                   case "71":
+                       out.println( "<td>Semi Luxe</td>");
+                       break;
+                   case "82":
+                       out.println( "<td>Luxe</td>");
+                       break;
+                   case "139":
+                       out.println( "<td>Limusina</td>");
+                       break;
+                   default:
+                       break;
+               }
 		out.println( "<td>" + iterator.next() + "</td>");
 		out.println( "<td>" + iterator.next() + "</td>");
 		out.println( "<td>" + iterator.next() + "</td>");
