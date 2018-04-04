@@ -1,5 +1,5 @@
 package main
-
+//curl -H "Content-Type: application/json" -d '{"Maker":2, "Model":3,"Nofdays":4,"Nofunits":6}' http://localhost:8080/carrentalnew
 import (
     "fmt"
     "log"
@@ -11,6 +11,7 @@ import (
     "encoding/csv"
     "os"
     "strconv"
+    "bufio"
 
 )
 
@@ -26,6 +27,7 @@ type RequestMessage struct {
 }
 
 
+
 func main() {
 
 router := mux.NewRouter().StrictSlash(true)
@@ -33,6 +35,7 @@ router.HandleFunc("/", Index)
 //router.HandleFunc("/endpoint/{param}", endpointFunc)
 //router.HandleFunc("/endpoint2/{param}", endpointFunc2JSONInput)
 router.HandleFunc("/carrentalnew",carrentalFuncnew)
+router.HandleFunc("/carrentalread",carrentalFuncread)
 
 log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -62,10 +65,51 @@ func carrentalFuncnew(w http.ResponseWriter, r *http.Request) {
 		nofunits := requestMessage.Nofunits
 		
 		total := maker * model * nofdays * nofunits
+		fmt.Println("Resumen de compra\n")
+		fmt.Print("Marca: ")
+		fmt.Println(maker)
+		fmt.Print("Model: ")
+		fmt.Println(model)
+		fmt.Print("Numero de dias: ")
+		fmt.Println(nofdays)
+		fmt.Print("Numero de unidades: ")
+		fmt.Println(nofunits)
+		fmt.Println("--------------------------------------------------")
+		fmt.Print("Total: ")
 		fmt.Println(total)
 		writeToFile(w,maker,model,nofdays,nofunits)
 		
 	}
+}
+
+func carrentalFuncread(w http.ResponseWriter, r *http.Request){
+	var rental RequestMessage
+	var rentals []RequestMessage
+	file, err := os.Open("rentals.csv")
+    if err!=nil {
+		json.NewEncoder(w).Encode(err)
+		return
+    }
+    reader := csv.NewReader(bufio.NewReader(file))
+    for {
+        record, err := reader.Read()
+        if err == io.EOF {
+           break
+        }
+        rental.Maker , _ = strconv.Atoi(record[0])
+        rental.Model, _ = strconv.Atoi(record[1])
+        rental.Nofdays, _ = strconv.Atoi(record[2])
+        rental.Nofunits, _ = strconv.Atoi(record[3])
+        rentals = append(rentals, rental)
+    }
+		jsonData, err := json.Marshal(rentals)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(w, "%q", string(jsonData))
+		
+	
 }
 
 func writeToFile(w http.ResponseWriter, make int, model int, nofdays int, nofunits int) {
